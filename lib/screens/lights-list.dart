@@ -84,16 +84,16 @@ class _LightsListState extends State<LightsList> {
                               int minutes = device['minutes'] as int? ?? 0;
 
 
-
-
+                              String brightnessValue = brightness <= 102? 'Low': brightness == 153 ? 'Medium' : 'Hight';
+                              String ledStateValue = ledState==1?'On':'Off';
 
                               return ListTile(
                                 title: Text('Device ID: $deviceId'),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('LED State: $ledState'),
-                                    Text('Brightness: $brightness'),
+                                    Text('LED State: $ledStateValue'),
+                                    Text('Brightness: $brightnessValue'),
                                     Text('Minutes: $minutes'),
                                   ],
                                 ),

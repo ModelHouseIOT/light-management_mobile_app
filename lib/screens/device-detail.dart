@@ -84,6 +84,7 @@ class _DeviceDetailState extends State<DeviceDetail> {
                   // This is called when the user toggles the switch.
                 },
               ),
+              SliderExample(deviceId: widget.deviceId),
               InputOptions(
                   deviceId: widget.deviceId,
                   ledState: widget.ledState,
@@ -93,6 +94,80 @@ class _DeviceDetailState extends State<DeviceDetail> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class SliderExample extends StatefulWidget {
+  final String deviceId;
+  const SliderExample({super.key, required this.deviceId});
+
+  @override
+  State<SliderExample> createState() => _SliderExampleState();
+}
+
+class _SliderExampleState extends State<SliderExample> {
+  double _currentSliderValue = 20;
+  String deviceName = '';
+  final databaseRef = FirebaseDatabase.instance.ref();
+  @override
+  void initState() {
+    super.initState();
+
+    final devicesRef = databaseRef.child('devices');
+
+    devicesRef.onValue.listen((event) {
+      final dataSnapshot = event.snapshot;
+
+      if (dataSnapshot.value is Map) {
+        final deviceData = dataSnapshot.value as Map<dynamic, dynamic>;
+        deviceData.forEach((key, value) {
+          if (value is Map && value['id'] == widget.deviceId) {
+            if (mounted) {
+              setState(() {
+                deviceName = key.toString();
+                _currentSliderValue = value['brightness'] ?? 20;
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Slider(
+      value: _currentSliderValue,
+      max: 255,
+      divisions: 5,
+      label: _currentSliderValue.round().toString(),
+      onChanged: (double value) {
+        setState(() {
+          _currentSliderValue = value;
+        });
+        final devicesRef = databaseRef.child('devices');
+
+        devicesRef.onValue.listen((event) {
+          final dataSnapshot = event.snapshot;
+
+          if (dataSnapshot.value is Map) {
+            final deviceData = dataSnapshot.value as Map<dynamic, dynamic>;
+            deviceData.forEach((key, value) {
+              if (value is Map && value['id'] == widget.deviceId) {
+                if (mounted) {
+                  setState(() {
+                    deviceName = key.toString();
+                  });
+                  FirebaseDatabase.instance.ref('/devices/$deviceName').update({
+                    "brightness": _currentSliderValue,
+                  });
+                }
+              }
+            });
+          }
+        });
+      },
     );
   }
 }
@@ -183,11 +258,16 @@ class _InputOptionsState extends State<InputOptions> {
                               deviceName: {
                                 "id": widget.deviceId,
                                 "LED": widget.ledState,
-                                "brightess": widget.brightness,
+                                "brightness": widget.brightness,
                                 "minutes": widget.minutes,
                                 "room": _roomType,
                               }
                             });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LightsList()),
+                            );
                           }
                         }
                       });

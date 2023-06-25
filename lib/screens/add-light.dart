@@ -98,7 +98,7 @@ class _AddLightState extends State<AddLight> {
                       _device: {
                         "id": uuid.v4(),
                         "LED": 0,
-                        "brightess": 30,
+                        "brightness": 102,
                         "minutes": 0,
                         "room": _roomType,
                       }
