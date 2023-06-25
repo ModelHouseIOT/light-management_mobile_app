@@ -34,7 +34,7 @@ class _MyConnectionState extends State<MyConnection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Connectivity Plus"),
+        title: const Text("Check Your WiFi Connection"),
       ),
       body: Center(
         child: Column(
